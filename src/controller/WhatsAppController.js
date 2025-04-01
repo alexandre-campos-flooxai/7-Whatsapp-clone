@@ -211,6 +211,69 @@ class WhatsAppController {
     this.el.btnFinishMicrophone.on('click', e=>{
       this.closeRecordMicrofone()
     })
+
+    this.el.inputText.on('keypress', e=>{
+      if(e.key === 'Enter' && !e.ctrlKey){
+        e.preventDefault()
+
+        this.el.btnSend.click()
+      }
+    })
+
+    this.el.inputText.on('input', e=>{
+      if(this.el.inputText.textContent.trim().length ||
+       this.el.inputText.querySelector('img')){
+        this.el.inputPlaceholder.hide()
+        this.el.btnSendMicrophone.hide()
+        this.el.btnSend.show()
+      }else{
+        this.el.inputPlaceholder.show()
+        this.el.btnSendMicrophone.show()
+        this.el.btnSend.hide()
+      }
+    })
+
+    this.el.btnSend.on('click', e=>{
+      console.log(this.el.inputText.innerHTML)
+    })
+
+    this.el.btnEmojis.on('click', e=>{
+      this.el.panelEmojis.toggleClass('open')
+    })
+
+    this.el.panelEmojis.querySelectorAll(".emojik").forEach((emoji) => {
+      emoji.on("click", (e) => {
+        let img = this.el.imgEmojiDefault.cloneNode();
+        
+        img.style.cssText = emoji.style.cssText;
+        img.dataset.unicode = emoji.dataset.unicode;
+        img.alt = emoji.dataset.unicode;
+
+        emoji.classList.forEach((name) => {
+          img.classList.add(name)
+        });
+        // this.el.inputText.appendChild(img)
+        let cursor = window.getSelection();
+
+        if(!cursor.focusNode || !cursor.focusNode.id == 'input-text'){
+          this.el.inputText.focus()
+          cursor = window.getSelection();
+        }
+
+        let range = document.createRange()
+
+        range = cursor.getRangeAt(0)
+        range.deleteContents()
+
+        let frag = document.createDocumentFragment()
+        frag.appendChild(img)
+        range.insertNode(frag)
+        range.setStartAfter(img)
+
+        this.el.inputText.dispatchEvent(new Event('input', { bubbles: true }))
+
+      });
+    });
   }
 
   startRecordMicrophoneTime(){

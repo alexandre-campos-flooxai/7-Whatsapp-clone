@@ -1,8 +1,17 @@
+import { Firebase } from "../utils/Firebase";
 import { Model } from "./Model";
+import { Format } from "../utils/Format";
 
 export class Message extends Model {
   constructor() {
     super();
+  }
+
+  get id() {
+    return this._data.id;
+  }
+  set id(value) {
+    return (this._data.id = value);
   }
 
   get content() {
@@ -34,9 +43,9 @@ export class Message extends Model {
   }
 
   getViewElement(me = true) {
-    let div = document.createElement('div')
+    let div = document.createElement("div");
 
-    div.className = 'message'
+    div.className = "message";
     switch (this.type) {
       case "contact":
         div.innerHTML = ` <div class="_3_7SH kNKwo tail">
@@ -78,7 +87,7 @@ export class Message extends Model {
                <div class="_6qEXM">
                    <div class="btn-message-send" role="button">Enviar mensagem</div>
                </div>
-       </div>`
+       </div>`;
         break;
       case "image":
         div.innerHTML = `<div class="_3_7SH _3qMSo  ">
@@ -130,10 +139,10 @@ export class Message extends Model {
                 </svg>
             </span>
         </div>
-    </div>`
+    </div>`;
         break;
       case "document":
-         div.innerHTML = `<div class="_3_7SH _1ZPgd  ">
+        div.innerHTML = `<div class="_3_7SH _1ZPgd  ">
     <div class="_1fnMt _2CORf">
         <a class="_1vKRe" href="#">
             <div class="_2jTyA" style="background-image: url()"></div>
@@ -177,10 +186,10 @@ export class Message extends Model {
             </div>
         </div>
     </div>
-                                            </div>`
+                                            </div>`;
         break;
       case "audio":
-         div.innerHTML = `
+        div.innerHTML = `
     <div class="_3_7SH _17oKL ">
         <div class="_2N_Df LKbsn">
             <div class="_2jfIu">
@@ -262,28 +271,42 @@ export class Message extends Model {
                 </svg>
             </span>
         </div>
-    </div>`
+    </div>`;
         break;
       default:
         div.innerHTML = `
-         <div class="font-style _3DFk6 tail">
+         <div class="font-style _3DFk6 tail" id="_${this.id}">
              <span class="tail-container"></span>
              <span class="tail-container highlight"></span>
              <div class="Tkt2p">
                  <div class="_3zb-j ZhF0n">
-                     <span dir="ltr" class="selectable-text invisible-space message-text">Oi!</span>
+                     <span dir="ltr" class="selectable-text invisible-space message-text">${this.content}</span>
                  </div>
                  <div class="_2f-RV">
                      <div class="_1DZAH">
-                         <span class="msg-time">11:33</span>
+                         <span class="msg-time">${Format.timeStampToTime(this.timeStamp)}</span>
                      </div>
                  </div>
              </div>
-        </div>`
+        </div>`;
     }
 
-    let className = (me) ? 'message-out' : "message-in" ;
+    let className = me ? "message-out" : "message-in";
     div.firstElementChild.classList.add(className);
-    return div
+    return div;
+  }
+
+  static send(chatId,from,type, content) {
+    return Message.getRef(chatId).add({
+      content,
+      timeStamp: new Date(),
+      status: "wait",
+      type,
+      from
+    });
+  }
+
+  static getRef(chatId) {
+    return Firebase.db().collection("chats").doc(chatId).collection("messages");
   }
 }

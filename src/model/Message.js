@@ -90,7 +90,6 @@ export class Message extends Model {
         div.innerHTML = ` <div class="_3_7SH kNKwo tail">
            <span class="tail-container"></span>
            <span class="tail-container highlight"></span>
-           
                <div class="_3DZ69" role="button">
                    <div class="_20hTB">
                        <div class="_1WliW" style="height: 49px; width: 49px;">
@@ -129,11 +128,6 @@ export class Message extends Model {
         img.src = this.content.photo;
         img.show();
        }
-
-       div.querySelector('.btn-message-send').on('click', e=>{
-        console.log('Enviar mensagem')
-       })
-
         break;
       case "image":
         div.innerHTML = `

@@ -1,6 +1,7 @@
 import { Firebase } from "../utils/Firebase";
 import { Model } from "./Model";
 import { Format } from "../utils/Format";
+import { Upload } from "../utils/Upload";
 
 export class Message extends Model {
   constructor() {
@@ -422,25 +423,7 @@ export class Message extends Model {
   }
 
   static upload(file, from) {
-    return new Promise((s, f) => {
-      let uploadTask = Firebase.hd()
-        .ref(from)
-        .child(Date.now() + "_" + file.name)
-        .put(file);
-
-      uploadTask.on(
-        "state_changed",
-        (e) => {
-          console.log("upload", e);
-        },
-        (err) => {
-          f(err);
-        },
-        () => {
-          s(uploadTask.snapshot);
-        }
-      );
-    });
+    return Upload.send(file,from)
   }
 
   static sendContact(chatId,from,contact){

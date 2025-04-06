@@ -7,6 +7,7 @@ import { User } from "../model/User";
 import { Chat } from "../model/Chat";
 import { Message } from "../model/Message";
 import { Base64 } from "../utils/base64";
+import { ContactsController } from "./ContactsControlle";
 export class WhatsAppController {
   constructor() {
     console.log("WhatsAppController ok");
@@ -93,7 +94,6 @@ export class WhatsAppController {
                            </div>
                            <div class="_1AwDx">
                                <div class="_itDl">
-                                   < title="digitando…" class="vdXUe _1wjpf typing" style="display:none">digita 
                                    <span class="_2_LEW last-message">
                                        <div class="_1VfKB">
                                            <span data-icon="status-dblcheck" class="">
@@ -177,7 +177,8 @@ export class WhatsAppController {
             this.el.panelMessagesContainer.appendChild(view);
           } else {
             let view = message.getViewElement(me);
-            this.el.panelMessagesContainer.querySelector("#_" + data.id).innerHTML = view.innerHTML
+            let parent = this.el.panelMessagesContainer.querySelector("#_" + data.id).parentNode;
+            parent.replaceChild(view,this.el.panelMessagesContainer.querySelector("#_" + data.id))
           }
           
           if(this.el.panelMessagesContainer.querySelector("#_" + data.id) && me){
@@ -536,11 +537,20 @@ export class WhatsAppController {
     });
 
     this.el.btnAttachContact.on("click", (e) => {
-      this.el.modalContacts.show();
+      this._contactsController = new ContactsController(this.el.modalContacts,this._user)
+      this._contactsController.on('select',contact =>{
+        Message.sendContact(
+          this._contactActive.chatId,
+          this._user.email,
+          contact
+        )
+      })
+      this._contactsController.open()
       console.log("contact");
     });
 
     this.el.btnCloseModalContacts.on("click", (e) => {
+      this._contactsController.open()
       this.el.modalContacts.hide();
     });
 
